@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tab Pets Settings</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-title">
+      <span class="header-icon">🐾</span>
+      <h1>Tab Pets</h1>
+    </div>
+    <p class="header-subtitle">Your browser's cutest companions</p>
+
+    <!-- Status pill -->
+    <div class="status-pill" id="status-pill">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-label">Active</span>
+    </div>
+  </header>
+
+  <!-- ── Main Settings ──────────────────────────────────── -->
+  <main class="settings">
+
+    <!-- Master ON/OFF toggle -->
+    <section class="setting-card" id="card-toggle">
+      <div class="setting-row">
+        <div class="setting-info">
+          <span class="setting-icon">✨</span>
+          <div>
+            <div class="setting-label">Enable Pets</div>
+            <div class="setting-desc">Show pets across all pages</div>
+          </div>
+        </div>
+        <label class="toggle" id="toggle-label" aria-label="Enable pets">
+          <input type="checkbox" id="enable-toggle" checked />
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Divider -->
+    <div class="section-divider">
+      <span>Pet Squad</span>
+    </div>
+
+    <!-- Pet type checkboxes -->
+    <section class="setting-card">
+      <div class="setting-label-solo">
+        <span class="setting-icon">🐾</span> Choose Your Pets
+      </div>
+      <div class="pet-grid" id="pet-grid">
+        <label class="pet-chip" data-pet="cat">
+          <input type="checkbox" name="pets" value="cat" checked />
+          <span class="pet-chip-inner">
+            <span class="pet-chip-emoji">🐱</span>
+            <span class="pet-chip-name">Cat</span>
+          </span>
+        </label>
+        <label class="pet-chip" data-pet="dog">
+          <input type="checkbox" name="pets" value="dog" checked />
+          <span class="pet-chip-inner">
+            <span class="pet-chip-emoji">🐕</span>
+            <span class="pet-chip-name">Dog</span>
+          </span>
+        </label>
+        <label class="pet-chip" data-pet="bird">
+          <input type="checkbox" name="pets" value="bird" checked />
+          <span class="pet-chip-inner">
+            <span class="pet-chip-emoji">🐦</span>
+            <span class="pet-chip-name">Bird</span>
+          </span>
+        </label>
+        <label class="pet-chip" data-pet="rabbit">
+          <input type="checkbox" name="pets" value="rabbit" />
+          <span class="pet-chip-inner">
+            <span class="pet-chip-emoji">🐰</span>
+            <span class="pet-chip-name">Rabbit</span>
+          </span>
+        </label>
+        <label class="pet-chip" data-pet="hamster">
+          <input type="checkbox" name="pets" value="hamster" />
+          <span class="pet-chip-inner">
+            <span class="pet-chip-emoji">🐹</span>
+            <span class="pet-chip-name">Hamster</span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Divider -->
+    <div class="section-divider">
+      <span>Behaviour</span>
+    </div>
+
+    <!-- Number of pets -->
+    <section class="setting-card">
+      <div class="setting-row">
+        <div class="setting-info">
+          <span class="setting-icon">🔢</span>
+          <div>
+            <div class="setting-label">Number of Pets</div>
+            <div class="setting-desc">How many roam the bar</div>
+          </div>
+        </div>
+        <select id="pet-count" class="select" aria-label="Number of pets">
+          <option value="1">1 pet</option>
+          <option value="2">2 pets</option>
+          <option value="3" selected>3 pets</option>
+          <option value="4">4 pets</option>
+          <option value="5">5 pets</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Speed slider -->
+    <section class="setting-card">
+      <div class="setting-label-solo">
+        <span class="setting-icon">⚡</span> Movement Speed
+      </div>
+      <div class="slider-wrap">
+        <span class="slider-label">🐢 Slow</span>
+        <input
+          type="range"
+          id="speed-slider"
+          min="1"
+          max="3"
+          step="1"
+          value="2"
+          class="slider"
+          aria-label="Movement speed"
+        />
+        <span class="slider-label">🚀 Fast</span>
+      </div>
+      <div class="slider-value-row">
+        <span id="speed-display" class="speed-badge">Normal</span>
+      </div>
+    </section>
+
+    <!-- Reset button -->
+    <div class="section-divider"><span>Actions</span></div>
+
+    <section class="setting-card action-card">
+      <button id="reset-btn" class="btn-reset" aria-label="Reset all pets and settings">
+        🔄 Reset Pets
+      </button>
+      <p class="action-desc">Restores all settings to defaults</p>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>Tab Pets v1.0.0</span>
+    <span id="save-toast" class="save-toast" aria-live="polite"></span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

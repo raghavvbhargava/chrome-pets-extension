@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Pets",
+  "version": "1.0.0",
+  "description": "Virtual pets that live in your browser tabs!",
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab"
+  ],
+
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Tab Pets"
+  }
+}

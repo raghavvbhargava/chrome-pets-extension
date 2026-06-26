@@ -1,6 +1,7 @@
 # 🐾 Tab Pets
 
 A Chrome extension that places **pixel-art pets** in a glassmorphism bar pinned to the top of every webpage. They walk, bounce, sit, and react when you click them.
+(also will be making changes in functionality / appearance as well as fixing any error I face while using this extension locally)
 
 ---
 

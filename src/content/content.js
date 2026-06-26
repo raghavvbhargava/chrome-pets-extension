@@ -24,15 +24,20 @@
     return canvas.toDataURL();
   }
 
+  /* Resolve asset paths via chrome.runtime.getURL */
+  const assetURL = (name) => chrome.runtime.getURL(`src/assets/${name}.png`);
+
   const PET_CONFIG = (() => {
     const cc = { C: "#E8B882", k: "#2D1B0E", p: "#FF8FAB", w: "#FFF8DC" };
     const dc = { D: "#C68642", k: "#2D1B0E", n: "#1A1A1A", t: "#FF6B81" };
     const bc = { B: "#5B9BD5", Y: "#FFD700", k: "#1A1A1A" };
+    const rc = { R: "#E0E0E0", k: "#1A1A1A", p: "#FF8FAB" };
+    const hc = { H: "#DFB075", k: "#1A1A1A", w: "#FFFFFF" };
 
     return [
       {
         label: "cat", speed: 3.0, bounceAmp: 3, bounceFreq: 0.18,
-        idleEmoji: "🐱",
+        idleImage: assetURL("cat"),
         reactSprite: makeSprite([
           "C......C", "CCCCCCCC", "CkCCCkCC",
           "CCC.p.CC", "CCCCCCCC", ".CCCCCC.",
@@ -41,7 +46,7 @@
       },
       {
         label: "dog", speed: 1.8, bounceAmp: 4, bounceFreq: 0.13,
-        idleEmoji: "🐕",
+        idleImage: assetURL("dog"),
         reactSprite: makeSprite([
           "DD....DD", "DDDDDDDD", ".DkDDkD.",
           ".DDDnDD.", ".DDDDDD.", "..DDDD..",
@@ -50,12 +55,28 @@
       },
       {
         label: "bird", speed: 0.8, bounceAmp: 5, bounceFreq: 0.08,
-        idleEmoji: "🐦",
+        idleImage: assetURL("bird"),
         reactSprite: makeSprite([
           "...BBB..", "..BBBBB.", ".YBBkBB.",
           ".YBBBBB.", "..BBBBB.", "...BBB..",
           "....B...", "........",
         ], bc),
+      },
+      {
+        label: "rabbit", speed: 2.2, bounceAmp: 4.5, bounceFreq: 0.16,
+        idleImage: assetURL("rabbit"),
+        reactSprite: makeSprite([
+          "R......R", "RR....RR", "RRRRRRRR", "RkRRRkRR",
+          "RRR.p.RR", "RRRRRRRR", ".RRRRRR.", ".RR..RR.",
+        ], rc),
+      },
+      {
+        label: "hamster", speed: 1.2, bounceAmp: 2.5, bounceFreq: 0.22,
+        idleImage: assetURL("hamster"),
+        reactSprite: makeSprite([
+          "H......H", "HHHHHHHH", "HkHHHHkH",
+          "HHH.w.HH", "HHHHHHHH", ".HHHHHH.", "..H..H..",
+        ], hc),
       },
     ];
   })();
@@ -136,6 +157,30 @@
     setTimeout(() => ring.remove(), 600);
   }
 
+  function spawnPawPrint(x, y, direction) {
+    const paw = document.createElement("img");
+    paw.src = chrome.runtime.getURL("src/assets/paw.png");
+    Object.assign(paw.style, {
+      position: "absolute",
+      left: `${x}px`,
+      top: `${y}px`,
+      width: "12px",
+      height: "12px",
+      opacity: "0.55",
+      pointerEvents: "none",
+      transform: `scaleX(${direction}) rotate(${direction * 15}deg)`,
+      transition: "opacity 1.2s ease, transform 1.2s ease",
+    });
+    bar.appendChild(paw);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        paw.style.opacity = "0";
+        paw.style.transform = `scaleX(${direction}) translate(0, -4px) scale(0.8) rotate(${direction * 30}deg)`;
+      });
+    });
+    setTimeout(() => paw.remove(), 1200);
+  }
+
   function showPixelReact(pet) {
     const img = document.createElement("img");
     img.src = pet.reactSprite;
@@ -154,14 +199,31 @@
   let pets = [];
   let rafId = null;
 
+  let currentSettings = {
+    enabled:      true,
+    petCount:     3,
+    selectedPets: ["cat", "dog", "bird"],
+    speed:        2,
+  };
+
+  const getSpeedMultiplier = (s) => {
+    if (s === 1) return 0.5;
+    if (s === 3) return 1.5;
+    return 1.0;
+  };
+
+  /* Create pet as an <img> element using the 3D realistic PNG */
   function createPetEl(cfg) {
-    const el = document.createElement("span");
-    el.textContent = cfg.idleEmoji;
+    const el = document.createElement("img");
+    el.src = cfg.idleImage;
+    el.alt = cfg.label;
     el.title = `Click the ${cfg.label}!`;
+    el.draggable = false;
     Object.assign(el.style, {
       position:      "absolute",
-      fontSize:      `${PET_SIZE}px`,
-      lineHeight:    "1",
+      width:         `${PET_SIZE}px`,
+      height:        `${PET_SIZE}px`,
+      objectFit:     "contain",
       userSelect:    "none",
       display:       "inline-block",
       cursor:        "pointer",
@@ -177,20 +239,38 @@
     pets = [];
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 
-    const trackWidth = bar.clientWidth - PET_SIZE;
+    if (!currentSettings.enabled || !currentSettings.selectedPets || !currentSettings.selectedPets.length) {
+      bar.style.display = "none";
+      document.documentElement.style.marginTop = "0px";
+      return;
+    }
 
-    pets = PET_CONFIG.map((cfg, i) => {
+    bar.style.display = "block";
+    document.documentElement.style.marginTop = `${BAR_HEIGHT}px`;
+
+    const trackWidth = bar.clientWidth - PET_SIZE;
+    const speedMult = getSpeedMultiplier(currentSettings.speed);
+
+    const allowedConfigs = PET_CONFIG.filter(cfg => currentSettings.selectedPets.includes(cfg.label));
+    if (!allowedConfigs.length) return;
+
+    const activeConfigs = [];
+    for (let i = 0; i < currentSettings.petCount; i++) {
+      activeConfigs.push(allowedConfigs[i % allowedConfigs.length]);
+    }
+
+    pets = activeConfigs.map((cfg, i) => {
       const saved = savedPositions?.[i] ?? null;
       const el = createPetEl(cfg);
 
       const pet = {
         el,
         label:         cfg.label,
-        idleEmoji:     cfg.idleEmoji,
+        idleImage:     cfg.idleImage,
         reactSprite:   cfg.reactSprite,
         posX:          saved?.posX        ?? randBetween(0, trackWidth),
         direction:     saved?.direction   ?? randDir(),
-        speed:         cfg.speed,
+        speed:         cfg.speed * speedMult,
         bounceAmp:     cfg.bounceAmp,
         bounceFreq:    cfg.bounceFreq,
         bouncePhase:   saved?.bouncePhase ?? randBetween(0, TWO_PI),
@@ -203,6 +283,7 @@
         reactTimer:    null,
         reactOverlay:  null,
         glowing:       false,
+        lastPawX:      -999,
       };
 
       el.addEventListener("click", () => {
@@ -216,6 +297,16 @@
         pet.reactOverlay = showPixelReact(pet);
 
         spawnGlowBurst(el);
+        for (let j = 0; j < 3; j++) {
+          setTimeout(() => {
+            const petRect = el.getBoundingClientRect();
+            const barRect = bar.getBoundingClientRect();
+            const cx = petRect.left + petRect.width / 2 - barRect.left - 6 + randBetween(-10, 10);
+            const cy = petRect.top + petRect.height / 2 - barRect.top - 6;
+            spawnPawPrint(cx, cy, randDir());
+          }, j * 120);
+        }
+
         pet.glowing = true;
         setTimeout(() => { pet.glowing = false; }, 550);
 
@@ -238,12 +329,12 @@
     if (pet.glowing) return "";
     const shadowY    = 2 + bobY * 0.4;
     const shadowBlur = 5 + bobY * 0.8;
-    const alpha      = lightMQ.matches ? 0.25 : 0.45;
+    const alpha      = lightMQ.matches ? 0.20 : 0.35;
     const shadow = `drop-shadow(0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0,0,0,${alpha}))`;
     if (isSitting) {
-      return `brightness(1.3) saturate(2.2) ${shadow} drop-shadow(0 0 10px rgba(167,139,250,0.80))`;
+      return `${shadow} drop-shadow(0 0 8px rgba(167,139,250,0.60))`;
     }
-    return `brightness(1.25) saturate(1.8) ${shadow} drop-shadow(0 0 5px rgba(255,200,80,0.50))`;
+    return shadow;
   }
 
   function animate(timestamp) {
@@ -292,16 +383,23 @@
       if (pet.posX >= trackWidth) { pet.posX = trackWidth; pet.direction = -1; }
       if (pet.posX <= 0)          { pet.posX = 0;          pet.direction =  1; }
 
+      // Spawn paw print trail as they walk
+      const topPx = barCenterY - PET_SIZE / 2;
+      if (pet.lastPawX === -999 || Math.abs(pet.posX - pet.lastPawX) > 35) {
+        pet.lastPawX = pet.posX;
+        spawnPawPrint(pet.posX + (PET_SIZE / 2) - 6, topPx + PET_SIZE - 8, pet.direction);
+      }
+
       pet.bouncePhase += pet.bounceFreq;
       if (pet.bouncePhase > TWO_PI) pet.bouncePhase -= TWO_PI;
 
       const bobY   = Math.abs(Math.sin(pet.bouncePhase)) * pet.bounceAmp;
-      const topPx  = barCenterY - PET_SIZE / 2 - bobY;
+      const petTopPx = barCenterY - PET_SIZE / 2 - bobY;
       const tilt   = pet.direction * 7 * Math.sin(pet.bouncePhase);
       const scaleX = pet.direction === 1 ? 1 : -1;
 
       pet.el.style.left      = `${pet.posX}px`;
-      pet.el.style.top       = `${topPx}px`;
+      pet.el.style.top       = `${petTopPx}px`;
       pet.el.style.transform = `scaleX(${scaleX}) rotate(${tilt}deg)`;
       if (!pet.glowing) pet.el.style.filter = buildFilter(pet, bobY, false);
     }
@@ -334,6 +432,8 @@
         break;
       case "TAB_PETS_SETTINGS_UPDATE":
         console.log("[Tab Pets] ⚙️ Settings update:", msg.settings);
+        currentSettings = msg.settings;
+        initPets(null);
         break;
     }
   });
@@ -343,8 +443,13 @@
   function boot(positions) {
     if (booted) return;
     booted = true;
-    initPets(positions);
-    startPositionSync();
+    chrome.storage.local.get("tabPetsSettings", (result) => {
+      if (result.tabPetsSettings) {
+        currentSettings = result.tabPetsSettings;
+      }
+      initPets(positions);
+      startPositionSync();
+    });
   }
 
   const bootTimeout = setTimeout(() => {
@@ -363,3 +468,4 @@
   console.log("[Tab Pets] 🐾 Content script loaded.");
 
 })();
+

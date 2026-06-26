@@ -1,6 +1,6 @@
 /* ============================================================
    Tab Pets — Popup Stylesheet
-   Pet-shop aesthetic: warm gradients, pastel accents, soft depth
+   Dark premium aesthetic with 3D realistic pet imagery
    ============================================================ */
 
 /* ── Google Font ────────────────────────────────────────── */
@@ -8,20 +8,20 @@
 
 /* ── CSS Tokens ─────────────────────────────────────────── */
 :root {
-  --bg-from:      #1a0533;
-  --bg-to:        #0d1b3e;
-  --surface:      rgba(255, 255, 255, 0.06);
-  --surface-hover:rgba(255, 255, 255, 0.10);
-  --border:       rgba(255, 255, 255, 0.10);
+  --bg-from:      #0a0a0a;
+  --bg-to:        #111111;
+  --surface:      rgba(255, 255, 255, 0.05);
+  --surface-hover:rgba(255, 255, 255, 0.08);
+  --border:       rgba(255, 255, 255, 0.08);
   --border-focus: rgba(167, 139, 250, 0.60);
 
   --accent:       #a78bfa;
   --accent-2:     #f9a8d4;
   --accent-glow:  rgba(167, 139, 250, 0.35);
 
-  --text-primary: #f0e6ff;
-  --text-secondary:#b5a8d0;
-  --text-muted:   #7c6fa0;
+  --text-primary: #eee;
+  --text-secondary:#999;
+  --text-muted:   #666;
 
   --success:      #4ade80;
   --warning:      #fbbf24;
@@ -31,7 +31,7 @@
   --radius-lg:    20px;
   --radius-pill:  999px;
 
-  --shadow-card:  0 4px 20px rgba(0,0,0,0.35);
+  --shadow-card:  0 4px 20px rgba(0,0,0,0.55);
   --shadow-glow:  0 0 16px var(--accent-glow);
 
   --transition:   0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -42,6 +42,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ── Body / Shell ───────────────────────────────────────── */
+html {
+  width: 340px;
+  min-height: 100px;
+}
+
 body {
   width: 340px;
   font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
@@ -57,24 +62,11 @@ body {
 .header {
   padding: 20px 18px 16px;
   background: linear-gradient(135deg,
-    rgba(167,139,250,0.18) 0%,
-    rgba(249,168,212,0.10) 100%);
+    rgba(167,139,250,0.12) 0%,
+    rgba(249,168,212,0.06) 100%);
   border-bottom: 1px solid var(--border);
   position: relative;
   overflow: hidden;
-}
-
-/* Decorative paw prints behind header */
-.header::before {
-  content: "🐾🐾🐾";
-  position: absolute;
-  right: -10px;
-  top: 50%;
-  transform: translateY(-50%) rotate(-15deg);
-  font-size: 48px;
-  opacity: 0.06;
-  pointer-events: none;
-  letter-spacing: 4px;
 }
 
 .header-title {
@@ -83,10 +75,14 @@ body {
   gap: 8px;
 }
 
-.header-icon {
-  font-size: 28px;
+/* 3D paw image in header */
+.header-icon-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
   animation: wiggle 2.4s ease-in-out infinite;
   display: inline-block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 @keyframes wiggle {
@@ -123,8 +119,8 @@ body {
   margin-top: 10px;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  background: rgba(74, 222, 128, 0.12);
-  border: 1px solid rgba(74, 222, 128, 0.25);
+  background: rgba(74, 222, 128, 0.10);
+  border: 1px solid rgba(74, 222, 128, 0.20);
   font-size: 11px;
   font-weight: 700;
   color: var(--success);
@@ -132,8 +128,8 @@ body {
 }
 
 .status-pill.inactive {
-  background: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.10);
+  border-color: rgba(251, 191, 36, 0.20);
   color: var(--warning);
 }
 
@@ -219,6 +215,15 @@ body {
   flex-shrink: 0;
 }
 
+/* 3D paw image in settings label */
+.setting-icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
 .setting-label {
   font-size: 13px;
   font-weight: 700;
@@ -261,7 +266,7 @@ body {
   width: 44px;
   height: 24px;
   border-radius: var(--radius-pill);
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.10);
   border: 1px solid var(--border);
   position: relative;
   transition: background var(--transition), box-shadow var(--transition);
@@ -315,15 +320,18 @@ body {
   gap: 4px;
   padding: 8px 4px 6px;
   border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.04);
   border: 1.5px solid var(--border);
   transition: all var(--transition);
 }
 
-.pet-chip-emoji {
-  font-size: 20px;
-  line-height: 1;
+/* 3D pet image in chip — replaces text emoji */
+img.pet-chip-emoji {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
   transition: transform var(--transition);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .pet-chip-name {
@@ -337,13 +345,14 @@ body {
 
 /* Checked state */
 .pet-chip input:checked + .pet-chip-inner {
-  background: rgba(167,139,250,0.15);
+  background: rgba(167,139,250,0.12);
   border-color: var(--accent);
   box-shadow: 0 0 8px var(--accent-glow);
 }
 
-.pet-chip input:checked + .pet-chip-inner .pet-chip-emoji {
+.pet-chip input:checked + .pet-chip-inner img.pet-chip-emoji {
   transform: scale(1.2);
+  filter: drop-shadow(0 0 8px rgba(167,139,250,0.6));
 }
 
 .pet-chip input:checked + .pet-chip-inner .pet-chip-name {
@@ -352,7 +361,7 @@ body {
 
 /* Hover */
 .pet-chip:hover .pet-chip-inner {
-  background: rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.07);
   border-color: var(--accent);
   transform: translateY(-2px);
 }
@@ -360,7 +369,7 @@ body {
 /* ── Select dropdown ────────────────────────────────────── */
 .select {
   appearance: none;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -382,7 +391,7 @@ body {
 }
 
 .select option {
-  background: #1a0533;
+  background: #111;
   color: var(--text-primary);
 }
 
@@ -406,7 +415,7 @@ body {
   flex: 1;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.10);
   outline: none;
   cursor: pointer;
   transition: box-shadow var(--transition-fast);
@@ -447,8 +456,8 @@ body {
   display: inline-block;
   padding: 2px 12px;
   border-radius: var(--radius-pill);
-  background: rgba(167,139,250,0.15);
-  border: 1px solid rgba(167,139,250,0.30);
+  background: rgba(167,139,250,0.12);
+  border: 1px solid rgba(167,139,250,0.25);
   color: var(--accent);
   font-size: 11px;
   font-weight: 800;
@@ -464,9 +473,9 @@ body {
 .btn-reset {
   width: 100%;
   padding: 10px 0;
-  border: 1.5px solid rgba(251, 191, 36, 0.35);
+  border: 1.5px solid rgba(251, 191, 36, 0.30);
   border-radius: var(--radius-sm);
-  background: rgba(251, 191, 36, 0.08);
+  background: rgba(251, 191, 36, 0.06);
   color: var(--warning);
   font-family: inherit;
   font-size: 13px;
@@ -477,7 +486,7 @@ body {
 }
 
 .btn-reset:hover {
-  background: rgba(251, 191, 36, 0.18);
+  background: rgba(251, 191, 36, 0.15);
   border-color: rgba(251, 191, 36, 0.6);
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(251, 191, 36, 0.2);

@@ -25,5 +25,12 @@
   "action": {
     "default_popup": "src/popup/popup.html",
     "default_title": "Tab Pets"
-  }
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["src/assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
